@@ -13,3 +13,15 @@ Documentation:
     add death sound
     add death animation
     find 2 minute song
+5 December '24
+    show cursor
+    indicate teleport range
+    find a way to fix movement
+    color collision instead of hitbox collision
+    play music
+    add functions to everything to call
+
+    def main to play the main while loop
+    https://www.youtube.com/watch?v=L3ktUWfAMPg
+    
+

@@ -14,30 +14,32 @@ clock=py.time.Clock()
 
 player_pos = py.Vector2(screen.get_width() / 2, screen.get_height() /2)
 
+rect1 = py.Rect(player_pos.x, player_pos.y, 100, 100)
+
 run = True
 while run:
 
     screen.fill((0, 0, 0))
 
-    py.draw.circle(screen,'blue',player_pos,10)
+    py.draw.rect(screen, '#45e1ee', rect1)
 
     keys=py.key.get_pressed()
     if keys[py.K_w]:
-        player_pos.y -= 200 * dt
-        if player_pos.y < 40:
-            player_pos.y = 40
+        rect1.y -= 200 * dt
+        if rect1.y < 40:
+            rect1.y = 40
     if keys[py.K_a]:
-        player_pos.x -= 200 * dt
-        if player_pos.x < 40:
-            player_pos.x = 40
+        rect1.x -= 200 * dt
+        if rect1.x < 40:
+            rect1.x = 40
     if keys[py.K_s]:
-        player_pos.y += 200 * dt
-        if player_pos.y > 680:
-            player_pos.y = 680
+        rect1.y += 200 * dt
+        #if rect1.y > 680:
+           # rect1.y = 680
     if keys[py.K_d]:
-        player_pos.x += 200 * dt
-        if player_pos.x > 1160:
-            player_pos.x = 1160
+        rect1.x += 200 * dt
+        #if rect1.x > 1160:
+            #rect1.x = 1160
 
     for event in py.event.get():
         if event.type == py.QUIT:
