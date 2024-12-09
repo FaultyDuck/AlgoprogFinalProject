@@ -24,4 +24,13 @@ Documentation:
     def main to play the main while loop
     https://www.youtube.com/watch?v=L3ktUWfAMPg
     
+9 December '24
+    finished sprite stacking in the code
+    add enemies
+    add bullets
+    add screen collisiions
+    import song
+    play song
+    main menu
+    add movement cursor and spacebar effect (optional)
 

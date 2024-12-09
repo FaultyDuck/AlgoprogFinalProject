@@ -2,7 +2,13 @@ import pygame as py
 import time
 import os
 import math
+from pygame import mixer
 from carutil import scale_image, stack
+
+mixer.init()
+mixer.music.load("flight.mp3")
+mixer.music.set_volume(0.7)
+mixer.music.play()
 
 BACKGROUND = scale_image(py.image.load("star.jpg"), 2)
 
@@ -48,6 +54,12 @@ class AllCar:
         self.y -= vertical
         self.x -= horizontal
 
+    def collide(self, mask, x=0, y=0):
+        ship_mask = py.mask.from_surface(self.img)
+        offset = (int(self.x - x), int(self.y - y))
+        poi = mask.overlap(ship_mask, offset)
+        return poi
+
 class PlayerCar(AllCar):
     IMG = SHIP
     START_POS = (WIDTH/2, HEIGHT/2)
@@ -63,6 +75,24 @@ def draw(win, images, player_car):
 
     player_car.draw(win)
     py.display.update()
+
+def moving(player):
+    keys = py.key.get_pressed()
+    moved = False
+
+    if keys[py.K_a]:
+        player_car.rotate(left = True)
+    if keys[py.K_d]:
+        player_car.rotate(right = True)
+    if keys[py.K_w]:
+        moved = True
+        player_car.move_forward()
+    if keys[py.K_s]:
+        moved = True
+        player_car.move_backward()
+
+    if not moved:
+        player_car.reduce_speed()
 
 FPS = 60
 
@@ -80,21 +110,8 @@ while run:
         if event.type == py.QUIT:
             run = False
 
-    keys = py.key.get_pressed()
-    moved = False
+    moving(player_car)
 
-    if keys[py.K_a]:
-        player_car.rotate(left = True)
-    if keys[py.K_d]:
-        player_car.rotate(right = True)
-    if keys[py.K_w]:
-        moved = True
-        player_car.move_forward()
-    if keys[py.K_s]:
-        moved = True
-        player_car.move_backward()
-
-    if not moved:
-        player_car.reduce_speed()
+    #if player_car.collide()
 
 py.quit()
