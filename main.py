@@ -3,7 +3,7 @@ import time
 import os
 import math
 from pygame import mixer
-from carutil import scale_image, stack
+from carutil import *
 
 mixer.init()
 mixer.music.load("flight.mp3")
@@ -67,7 +67,6 @@ class PlayerCar(AllCar):
     def reduce_speed(self):
         self.vel = max(self.vel - self.acceleration / 2, 0)
         self.move()
-
 
 def draw(win, images, player_car):
     for img, pos in images:
