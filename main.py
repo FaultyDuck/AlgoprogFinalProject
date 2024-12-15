@@ -13,10 +13,13 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GRAY = (100, 100, 100)
 BLUE = (50, 150, 255)
+RED = (255,0,0)
 
 BACKGROUND = scale_image(py.image.load("star.jpg"), 2)
 
 SHIP = [py.image.load('ship/' + img) for img in os.listdir('ship')]
+
+SHIPMASK = [py.mask.from_surface(image) for image in SHIP]
 
 WIDTH, HEIGHT = BACKGROUND.get_width(), BACKGROUND.get_height()
 
@@ -26,11 +29,25 @@ py.display.set_caption('Maingame')
 font = py.font.Font(None, 74)
 button_font = py.font.Font(None, 50)
 
+PROD = py.Rect(20, 20, 20, 20)
+
 #temp
 #obstacles = []
 #for _ in range(16):
 #    obstacle_rect = py.Rect(random.randint(0, 500), random.randint(0, 300), 25, 25)
 #    obstacles.append(obstacle_rect)
+
+def mask_to_surface(mask, color=(255, 255, 255)):
+    size = mask.get_size()
+    surface = py.Surface(size, py.SRCALPHA)  # Create a transparent surface
+    surface.fill((0, 0, 0, 0))  # Ensure it starts fully transparent
+
+    # Set the mask pixels to the specified color
+    for x in range(size[0]):
+        for y in range(size[1]):
+            if mask.get_at((x, y)):  # If the pixel is part of the mask
+                surface.set_at((x, y), color)
+    return surface
 
 class AllCar:
     def __init__(self, max_vel, rotation_vel):
@@ -114,7 +131,17 @@ def moving(player):
     if not moved:
         player_car.reduce_speed()
 
+class projectiles():
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+    
+    def drawS(self, win):
+        py.draw.rect(win, RED, PROD)
+
 FPS = 60
+
+SURFMASK = [mask_to_surface(mask, color=(255, 0, 0)) for mask in SHIPMASK]
 
 images = [(BACKGROUND, (0, 0))]
 player_car = PlayerCar(4, 4)
@@ -144,13 +171,19 @@ def start_game():
 
     mixer.init()
     mixer.music.load("flight.mp3")
-    mixer.music.set_volume(0.5)
+    mixer.music.set_volume(0.3)
     mixer.music.play()
+
+    positions = [(player_car.x, player_car.y)]
 
     while start:
         gameclock.tick(FPS)
 
         draw(WIN, images, player_car)
+
+        for i, surface in enumerate(SURFMASK):
+            if i < len(positions):  # Ensure we don't exceed the number of positions
+                WIN.blit(surface, positions[i])
         
         for event in py.event.get():
             if event.type == py.QUIT:
@@ -159,6 +192,8 @@ def start_game():
                 if event.key == py.K_ESCAPE:
                     start = False
                     #run = True use class system to start and stop the instances
+
+        
 
         #screen collisions
         if player_car.y < 20:
