@@ -1,76 +1,80 @@
 import pygame
+import random
 import sys
-from pygame.locals import QUIT
-from random import randint
 
 # Initialize Pygame
 pygame.init()
 
-# Screen dimensions and settings
+# Screen dimensions
 SCREEN_WIDTH, SCREEN_HEIGHT = 800, 800
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("Spawning Boxes")
+pygame.display.set_caption("Delayed and Interval Box Spawning")
 
 # Colors
 WHITE = (255, 255, 255)
-BLUE = (50, 150, 255)
+BLUE = (0, 0, 255)
 
 # Box class
 class Box:
-    def __init__(self, x, y, size, speed):
-        self.rect = pygame.Rect(x, y, size, size)
-        self.speed = speed
+    def __init__(self, x, y, size):
+        self.x = x
+        self.y = y
+        self.size = size
+        self.color = BLUE
+        self.width = 20
+        self.height = 90
 
-    def update(self):
-        self.rect.y += self.speed
+    def move(self):
+        self.y += 5  # Move the box downward
+        if self.y > SCREEN_HEIGHT:
+            self.y = -self.size  # Reset position to top when it moves off-screen
 
     def draw(self, surface):
-        pygame.draw.rect(surface, BLUE, self.rect)
+        pygame.draw.rect(surface, self.color, (self.x, self.y, self.width, self.height))
 
 # Game clock and settings
 clock = pygame.time.Clock()
-running = True
 FPS = 60
 
 # Timer variables
-SPAWN_INTERVAL = 800  # milliseconds
-DURATION = 2 * 60 * 1000  # 2 minutes in milliseconds
-start_time = pygame.time.get_ticks()
+INITIAL_DELAY = 15000  # 15 seconds in milliseconds
+SPAWN_INTERVAL = 800   # 800 milliseconds
+start_time = pygame.time.get_ticks()  # Record the program's start time
+last_spawn_time = None  # To track the last box spawn time
 
-# Box list
+# List to hold all boxes
 boxes = []
 
 # Main game loop
+running = True
 while running:
     # Clear the screen
     screen.fill(WHITE)
 
-    # Check time
+    # Check the current time
     current_time = pygame.time.get_ticks()
-    elapsed_time = current_time - start_time
 
-    if elapsed_time > DURATION:
-        running = False  # End the game after 2 minutes
+    # Check if the initial delay has passed
+    if current_time - start_time >= INITIAL_DELAY:
+        # Begin spawning at intervals of 800 milliseconds
+        if last_spawn_time is None or current_time - last_spawn_time >= SPAWN_INTERVAL:
+            # Spawn a box at a random horizontal position
+            x = random.randint(0, SCREEN_WIDTH - 50)
+            new_box = Box(x, -50, 50)  # Start slightly above the screen
+            boxes.append(new_box)
+
+            # Update the last spawn time
+            last_spawn_time = current_time
+
+    # Update and draw all boxes
+    for box in boxes:
+        box.move()
+        box.draw(screen)
 
     # Event handling
     for event in pygame.event.get():
-        if event.type == QUIT:
+        if event.type == pygame.QUIT:
             running = False
-
-    # Spawn new box every 800 milliseconds
-    if elapsed_time % SPAWN_INTERVAL < 16:  # Check close to the frame time
-        x_position = randint(0, SCREEN_WIDTH - 50)  # Random x position
-        new_box = Box(x_position, 0, 50, 5)  # Box size 50, speed 5
-        boxes.append(new_box)
-
-    # Update and draw boxes
-    for box in boxes[:]:
-        box.update()
-        box.draw(screen)
-
-        # Remove box if it moves off the screen
-        if box.rect.top > SCREEN_HEIGHT:
-            boxes.remove(box)
 
     # Update the display
     pygame.display.flip()
