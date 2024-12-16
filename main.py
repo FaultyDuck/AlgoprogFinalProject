@@ -30,7 +30,7 @@ py.display.set_caption('Maingame')
 font = py.font.Font(None, 74)
 button_font = py.font.Font(None, 50)
 
-PROD = py.Rect(20, 20, 20, 20)
+# PROD = py.Rect(20, 20, 20, 20)
 
 #temp
 #obstacles = []
@@ -57,6 +57,7 @@ class AllCar:
         self.rotation_vel = rotation_vel
         self.angle = 0
         self.img = self.IMG
+        self.mask = py.mask.from_surface(self.img[0])
         self.x, self.y = self.START_POS
         self.acceleration = 0.1
     
@@ -85,15 +86,17 @@ class AllCar:
         self.y -= vertical
         self.x -= horizontal
 
-    def collide(self, mask, x=0, y=0):
-        ship_mask = py.mask.from_surface(self.img)
-        offset = (int(self.x - x), int(self.y - y))
-        poi = mask.overlap(ship_mask, offset)
-        return poi
+    # def collide(self, mask, x=0, y=0):
+    #     ship_mask = py.mask.from_surface(self.img[0])
+    #     offset = (int(self.x - x), int(self.y - y))
+    #     poi = mask[0].overlap(ship_mask, offset)
+    #     return poi
 
 class PlayerCar(AllCar):
     IMG = SHIP
     START_POS = (WIDTH/2, HEIGHT/2)
+    def __init__(self):
+        super().__init__(4,4)
 
     def reduce_speed(self):
         self.vel = max(self.vel - self.acceleration / 2, 0)
@@ -154,22 +157,17 @@ class Circle:
     def draw(self, surface):
         py.draw.circle(surface, RED, (int(self.x), int(self.y)), self.radius)
 
-    def check_collisions(self, masks_list):
-        # Iterate through the list of masks and check for overlap with each mask
-        for other_mask_obj in masks_list:
-            # Unpack the x, y, and mask directly from the list (without trying to unpack mask incorrectly)
-            other_x, other_y, other_mask = other_mask_obj
-            
-            # Calculate the offset based on positions of the two objects
-            offset = (int(self.x - other_x), int(self.y - other_y))
-            overlap_area = self.mask.overlap(other_mask, offset)  # Check for overlap
-
-            # If overlap_area is not None, a collision occurred
-            if overlap_area:
-                print("Collision detected!")
-                return True
+    def check_collision(self, other_object):
+        # Check if the mask of this expanding line overlaps with another object's mask
+        offset = (int(self.x - other_object.x), int(self.y - other_object.y))
+        overlap_area = self.mask.overlap(other_object.mask, offset)  # Checks for overlap of masks
+        
+        # If overlap_area is not None, there's a collision
+        if overlap_area:
+            print("Collision detected!")
+            return True
         return False
-    
+  
 class MiniCircle:
     def __init__(self, x, y, radius, angle, speed):
         self.x = x
@@ -190,20 +188,15 @@ class MiniCircle:
     def draw(self, surface):
         py.draw.circle(surface, RED, (int(self.x), int(self.y)), self.radius)
 
-    def check_collisions(self, masks_list):
-        # Iterate through the list of masks and check for overlap with each mask
-        for other_mask_obj in masks_list:
-            # Unpack the x, y, and mask directly from the list (without trying to unpack mask incorrectly)
-            other_x, other_y, other_mask = other_mask_obj
-            
-            # Calculate the offset based on positions of the two objects
-            offset = (int(self.x - other_x), int(self.y - other_y))
-            overlap_area = self.mask.overlap(other_mask, offset)  # Check for overlap
-
-            # If overlap_area is not None, a collision occurred
-            if overlap_area:
-                print("Collision detected!")
-                return True
+    def check_collision(self, other_object):
+        # Check if the mask of this expanding line overlaps with another object's mask
+        offset = (int(self.x - other_object.x), int(self.y - other_object.y))
+        overlap_area = self.mask.overlap(other_object.mask, offset)  # Checks for overlap of masks
+        
+        # If overlap_area is not None, there's a collision
+        if overlap_area:
+            print("Collision detected!")
+            return True
         return False
 
 class Box:
@@ -228,20 +221,15 @@ class Box:
     def draw(self, surface):
         py.draw.rect(surface, self.color, (self.x, self.y, self.width, self.height))
 
-    def check_collisions(self, masks_list):
-        # Iterate through the list of masks and check for overlap with each mask
-        for other_mask_obj in masks_list:
-            # Unpack the x, y, and mask directly from the list (without trying to unpack mask incorrectly)
-            other_x, other_y, other_mask = other_mask_obj
-            
-            # Calculate the offset based on positions of the two objects
-            offset = (int(self.x - other_x), int(self.y - other_y))
-            overlap_area = self.mask.overlap(other_mask, offset)  # Check for overlap
-
-            # If overlap_area is not None, a collision occurred
-            if overlap_area:
-                print("Collision detected!")
-                return True
+    def check_collision(self, other_object):
+        # Check if the mask of this expanding line overlaps with another object's mask
+        offset = (int(self.x - other_object.x), int(self.y - other_object.y))
+        overlap_area = self.mask.overlap(other_object.mask, offset)  # Checks for overlap of masks
+        
+        # If overlap_area is not None, there's a collision
+        if overlap_area:
+            print("Collision detected!")
+            return True
         return False
 
 class ExpandingLine:
@@ -270,20 +258,15 @@ class ExpandingLine:
     def is_expanded(self):
         return self.width >= self.max_width
 
-    def check_collisions(self, masks_list):
-        # Iterate through the list of masks and check for overlap with each mask
-        for other_mask_obj in masks_list:
-            # Unpack the x, y, and mask directly from the list (without trying to unpack mask incorrectly)
-            other_x, other_y, other_mask = other_mask_obj
-            
-            # Calculate the offset based on positions of the two objects
-            offset = (int(self.x - other_x), int(self.y - other_y))
-            overlap_area = self.mask.overlap(other_mask, offset)  # Check for overlap
-
-            # If overlap_area is not None, a collision occurred
-            if overlap_area:
-                print("Collision detected!")
-                return True
+    def check_collision(self, other_object):
+        # Check if the mask of this expanding line overlaps with another object's mask
+        offset = (int(self.x - other_object.x), int(self.y - other_object.y))
+        overlap_area = self.mask.overlap(other_object.mask, offset)  # Checks for overlap of masks
+        
+        # If overlap_area is not None, there's a collision
+        if overlap_area:
+            print("Collision detected!")
+            return True
         return False
 
 SPAWN_INTERVAL_BOX = 1000
@@ -302,8 +285,19 @@ FPS = 60
 
 SURFMASK = [mask_to_surface(mask, color=(255,255,255)) for mask in SHIPMASK]
 
+# def combine_masks(masks, positions, surface_size):
+#     combined_mask = py.mask.Mask(surface_size)
+#     for mask, pos in zip(masks, positions):
+#         combined_mask.draw(mask, pos)
+
+#     return combined_mask
+
 images = [(BACKGROUND, (0, 0))]
-player_car = PlayerCar(4, 4)
+player_car = PlayerCar()
+
+# posCAR = [(100, 100)]
+
+# combined_mask = combine_masks(SHIPMASK, posCAR, (WIDTH, HEIGHT))
 
 circles = []
 mini_circles = []
@@ -367,7 +361,6 @@ def start_game():
     positions = [(player_car.x, player_car.y)]
 
     while start:
-
         draw(WIN, images, player_car)
 
         current_time = py.time.get_ticks()
@@ -395,8 +388,6 @@ def start_game():
         if spawning_enabled and elapsed_time % SPAWN_INTERVAL_CIRCLE < 16:
             new_circle = Circle(WIDTH // 2, HEIGHT, 40, 5)
             circles.append(new_circle)
-            if new_circle.check_collisions(SHIPMASK):
-                start = False
 
         for circle in circles[:]:
             if not circle.split:
@@ -409,8 +400,8 @@ def start_game():
                     angle = i * angle_step
                     new_mini_circle = MiniCircle(circle.x, circle.y, 10, angle, 5)
                     mini_circles.append(new_mini_circle)
-                    if new_mini_circle.check_collisions(SHIPMASK):
-                        start = False
+                    # if new_mini_circle.check_collision(combined_mask):
+                    #     start = False
                 circles.remove(circle)
 
         #Update and draw mini circles
@@ -437,8 +428,8 @@ def start_game():
                 #Update the last spawn time
                 last_spawn_time = current_time
 
-                if new_box.check_collisions(SHIPMASK):
-                    start = False
+                # if new_box.check_collision(combined_mask):
+                #     start = False
 
         if current_time - start_time >= DELETE_ALL_BOXES_TIME:
             boxes.clear()
@@ -461,8 +452,8 @@ def start_game():
             height=HEIGHT,       
             expand_speed=8             
         )
-            if new_line.check_collisions(SHIPMASK):
-                start = False
+            # if new_line.check_collision(combined_mask):
+            #     start = False
             lines.append(new_line)
 
         #Update and draw lines
@@ -497,6 +488,20 @@ def start_game():
         if player_car.x > (WIDTH - 20):
             player_car.x = (WIDTH - 20)
         
+
+        for i in circles:
+            if i.check_collision(player_car):
+                start = False
+        for i in mini_circles:
+            if i.check_collision(player_car):
+                start = False
+        for i in boxes:
+            if i.check_collision(player_car):
+                start = False
+        for i in lines:
+            if i.check_collision(player_car):
+                start = False
+
         moving(player_car)
         gameclock.tick(FPS)
 
@@ -516,6 +521,7 @@ buttons = [
 def play_game():
     run = True
     clock = py.time.Clock()
+    py.mouse.set_visible(True)
 
     while run:
         clock.tick(FPS)
@@ -538,7 +544,6 @@ def play_game():
         
         py.display.flip()
 
-    #if player_car.collide()
 
     py.quit()
     sys.exit()
